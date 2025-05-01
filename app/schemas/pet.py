@@ -1,0 +1,30 @@
+from datetime import date
+from typing import Optional, List
+from pydantic import BaseModel, Field
+
+from app.database.types import AnimalType
+from app.schemas import MedicalRecordOut
+
+
+class PetBase(BaseModel):
+    name: str = Field(max_length=50)
+    animal_type: AnimalType
+    breed: Optional[str] = Field(default=None, max_length=50)
+    birth_date: Optional[date] = None
+    medical_notes: Optional[str] = None
+
+
+class PetCreate(PetBase):
+    pass
+
+
+class PetOut(PetBase):
+    id: int
+    owner_id: int
+    medical_records: List[MedicalRecordOut] = []
+
+    class Config:
+        from_attributes = True
+
+
+PetOut.update_forward_refs()
