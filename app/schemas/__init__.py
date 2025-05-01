@@ -1,6 +1,5 @@
 from .booking import BookingCreate, BookingOut, BookingBase
-from .pet import PetOut, PetBase, PetCreate
-from .medical import MedicalRecordBase, MedicalRecordOut
+from .pet import PetOut, PetBase, PetCreate, MedicalRecordBase, MedicalRecordOut
 from .service import (
     ServiceBase,
     SittingServiceCreate,
