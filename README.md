@@ -2,7 +2,7 @@
 
 1. Склонируйте репозиторий:
    ```bash
-   git clone https://github.com/PerfectSoon/petcare.git
+   git clone https://github.com/PerfectSoon/Petcare.git
    cd petcare
    ```
 2. Скопируйте .env:
