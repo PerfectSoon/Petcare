@@ -66,7 +66,7 @@ async def create_med_rec(
     db: AsyncSession = Depends(get_db),
     current_user: Owner = Depends(get_current_active_owner),
 ):
-    service = MedRecordService(repository=MedicalRecordRepo(db=db))
+    service = MedRecordService(repository=MedicalRecordRepo(db=db),pet_repo=PetRepository(db=db))
 
     created_med_rec = await service.create_med_record(
         current_user.id, pet_id, med_rec_data
@@ -101,7 +101,7 @@ async def update_med_rec_for_pet(
     service = MedRecordService(repository=MedicalRecordRepo(db=db))
 
     updated = await service.update_med_record(
-        current_user, med_rec_id, med_rec_data
+        current_user.id, med_rec_id, med_rec_data
     )
     if not updated:
         raise HTTPException(status_code=404, detail="Данные не обновлены")

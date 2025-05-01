@@ -14,7 +14,8 @@ class AbstractRepository(Generic[T]):
         self.db = db
 
     async def get_by_id(self, id: int) -> Optional[T]:
-        return await self.db.get(self.model, id)
+        result = await self.db.get(self.model, id)
+        return result
 
     async def get_all(self, skip: int = 0, limit: int = 100) -> List[T]:
         result = await self.db.execute(

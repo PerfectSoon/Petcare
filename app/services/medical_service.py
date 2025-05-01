@@ -1,9 +1,10 @@
 from dataclasses import dataclass
+from typing import Optional
 
 from fastapi import HTTPException
 
 from app.database.models import MedicalRecord
-from app.repositories import MedicalRecordRepo
+from app.repositories import MedicalRecordRepo, PetRepository
 
 from app.schemas import MedicalRecordBase
 
@@ -11,11 +12,13 @@ from app.schemas import MedicalRecordBase
 @dataclass(kw_only=True, frozen=True, slots=True)
 class MedRecordService:
     repository: MedicalRecordRepo
+    pet_repo: Optional[PetRepository] = None
 
     async def create_med_record(
         self, owner_id: int, pet_id: int, record_data: MedicalRecordBase
     ) -> MedicalRecord:
-        pet = await self.repository.get_by_id(pet_id)
+        pet = await self.pet_repo.get_by_id(pet_id)
+
         if not pet:
             raise HTTPException(status_code=400, detail="Питомец не найден")
         if pet.owner_id != owner_id:
@@ -50,7 +53,11 @@ class MedRecordService:
                 status_code=400, detail="Медицинская запись не найдена"
             )
         pet = await self.repository.get_pet_by_id(med_rec_id)
-        if not pet or pet.owner_id != owner_id:
-            raise HTTPException(status_code=403, detail="Доступ запрещен")
+        print(pet)
+        print(f"pet.owner_id - {pet.owner_id} | owner_id - {owner_id}")
+        if not pet:
+            raise HTTPException(status_code=403, detail="Питомец не найден")
+        if pet.owner_id != owner_id:
+            raise HTTPException(status_code=403, detail="Доступ запрещен Ы")
 
         return await self.repository.update(med_rec, data)

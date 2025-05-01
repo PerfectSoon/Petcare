@@ -25,7 +25,7 @@ class BookingService:
         except IntegrityError:
             raise HTTPException(
                 status_code=400,
-                detail="Слот занят или услуга уже забронирована",
+                detail="Слот занят или услуга уже забронирована. Возможно выбранного сервиса не существует",
             )
 
     async def get_booking_by_id(self, booking_id: int) -> Booking | None:
