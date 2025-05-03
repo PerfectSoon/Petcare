@@ -1,3 +1,5 @@
+from typing import List
+
 from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -9,7 +11,7 @@ from app.repositories import PetRepository
 from app.schemas import (
     PetCreate,
     PetOut,
-    PetBase,
+    PetUpdate,
     MedicalRecordBase,
     MedicalRecordOut,
 )
@@ -18,6 +20,18 @@ from app.database.connection import get_db
 
 router = APIRouter()
 
+
+@router.post("/list_pets", response_model=List[PetOut])
+async def get_pets(
+    db: AsyncSession = Depends(get_db),
+    current_user: Owner = Depends(get_current_active_owner),
+):
+    pet_service = PetService(pet_repository=PetRepository(db=db))
+
+    list_pets = await pet_service.list_pets_by_owner(owner_id=current_user.id)
+    if list_pets is None:
+        raise HTTPException(status_code=400, detail="У вас нет ни одного питомца")
+    return list_pets
 
 @router.post("/register", response_model=PetOut)
 async def register_pet(
@@ -40,15 +54,14 @@ async def delete_pet(pet_id: int, db: AsyncSession = Depends(get_db)):
     pet_repo = PetRepository(db=db)
     pet_service = PetService(pet_repository=pet_repo)
 
-    await pet_service.delete_pet(pet_id)
-
+    if not await pet_service.delete_pet(pet_id):
+        return {"detail": "Питомец не удален"}
     return {"detail": "Питомец удален"}
-
 
 @router.put("/update/{pet_id}", response_model=PetOut)
 async def update_pet(
     pet_id: int,
-    pet_data: PetBase,
+    pet_data: PetUpdate,
     db: AsyncSession = Depends(get_db),
 ):
     pet_service = PetService(pet_repository=PetRepository(db=db))

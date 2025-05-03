@@ -43,5 +43,5 @@ def decode_access_token(token: str) -> TokenData:
     except jwt.PyJWTError as e:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail=f"Token validation error: {str(e)}",
+            detail=f"Ошибка валидации токена: {str(e)}",
         )

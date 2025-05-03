@@ -22,7 +22,13 @@ class MedicalRecordOut(MedicalRecordBase):
 class PetBase(BaseModel):
     name: str = Field(max_length=50)
     animal_type: AnimalType
-    breed: Optional[str] = Field(default=None, max_length=50)
+    breed: Optional[str] = Field(default="Без породы", max_length=50)
+    birth_date: Optional[date] = None
+    medical_notes: Optional[str] = None
+
+class PetUpdate(BaseModel):
+    name: str = Field(max_length=50)
+    breed: Optional[str] = Field(default="Без породы", max_length=50)
     birth_date: Optional[date] = None
     medical_notes: Optional[str] = None
 
@@ -40,4 +46,4 @@ class PetOut(PetBase):
         from_attributes = True
 
 
-PetOut.update_forward_refs()
+PetOut.model_rebuild()
