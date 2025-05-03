@@ -1,5 +1,5 @@
 from .booking import BookingCreate, BookingOut, BookingBase
-from .pet import PetOut, PetBase, PetCreate, MedicalRecordBase, MedicalRecordOut
+from .pet import PetOut, PetBase, PetCreate, MedicalRecordBase, MedicalRecordOut, PetUpdate
 from .service import (
     ServiceBase,
     SittingServiceCreate,
@@ -35,6 +35,7 @@ __all__ = [
     "PetOut",
     "PetBase",
     "PetCreate",
+    "PetUpdate",
     "MedicalRecordBase",
     "MedicalRecordOut",
     "ServiceBase",
@@ -61,3 +62,5 @@ __all__ = [
     "TokenData",
     "Token",
 ]
+
+

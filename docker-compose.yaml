@@ -1,17 +1,39 @@
-version: "3.9"
-
 services:
   db:
-    image: mysql:8.0
+    container_name: "db"
+    image: postgres:16
+    restart: always
     env_file:
       - .env
-    command: --default-authentication-plugin=mysql_native_password
     volumes:
-      - db_data:/var/lib/mysql
+      - db_data:/var/lib/postgresql/data
     ports:
-      - "3307:3306"
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
 
-  web:
+  db_test:
+    container_name: "db_test"
+    image: postgres:16
+    restart: always
+    env_file:
+      - .env
+    volumes:
+      - db_test_data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_DB: test
+      POSTGRES_USER: test
+      POSTGRES_PASSWORD: test
+    networks:
+      - test_network
+
+  app:
+    container_name: app
+    image: app
     build:
       context: .
       dockerfile: Dockerfile
@@ -24,5 +46,35 @@ services:
     depends_on:
       - db
 
+  test:
+    profiles: [ "test" ]
+    container_name: test
+    build: .
+    entrypoint:
+      - /wait-for-it.sh
+      - db_test:5432
+      - --timeout=60
+      - --strict
+      - --
+      - sh
+      - -c
+      - alembic upgrade head && pytest -v tests/
+    volumes:
+      - .:/app
+    env_file:
+      - .env
+    environment:
+      - DATABASE_URL=${TEST_DATABASE_URL}
+    depends_on:
+      - db_test
+    networks:
+      - test_network
+
+
 volumes:
   db_data:
+  db_test_data:
+
+networks:
+  test_network:
+    driver: bridge
