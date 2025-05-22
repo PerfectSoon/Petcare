@@ -67,7 +67,6 @@ async def test_get_pet_by_id_found(service, repo):
 
     result = await service.get_pet_by_id(1)
 
-    # Синхронный вызов репозитория, поэтому assert_called
     repo.get.assert_called_once_with(1)
     assert result == pet
 
@@ -106,7 +105,7 @@ async def test_update_pet_success(service, repo):
     result = await service.update_pet(1, update_data)
 
     repo.get.assert_called_once_with(1)
-    repo.update.assert_awaited_once_with(1, update_data)  # update — асинхронный
+    repo.update.assert_awaited_once_with(1, update_data)
     assert result == updated
 
 @pytest.mark.asyncio
